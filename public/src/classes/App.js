@@ -11,13 +11,9 @@ class App {
 
   init() {
     this.loader.load([{
-      id: 'stagea-bg',
+      id: 'ground',
       type: 'img',
-      src: './assets/images/stages/stageA/background.jpg'
-    }, {
-      id: 'platform1',
-      type: 'img',
-      src: './assets/images/stages/stageA/platform1.png'
+      src: './assets/images/textures/ground.png'
     }], (assets) => {
       this.assets = assets;
       this.game.assets = assets;

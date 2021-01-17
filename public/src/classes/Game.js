@@ -1,20 +1,21 @@
-import { View } from './View.js';
+import { Stage } from './Stage.js';
 import { Sync } from './Sync.js';
 
 class Game {
 
   constructor() {
-    this.view = new View(this);
+    this.stage = new Stage(this);
     this.sync = new Sync();
     this.assets = null;
   }
 
   run() {
+    this.stage.init();
     this.update();
   }
 
   update() {
-    this.view.update();
+    this.stage.update();
     window.requestAnimationFrame(() => {
       this.update();
     });
