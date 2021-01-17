@@ -29,7 +29,7 @@ class Stage {
 
         const hemiLight = new THREE.HemisphereLight(0xffffff, 0xb1b1b1);
         this.scene.add(hemiLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.2);
         this.scene.add(directionalLight);
 
         /*const light = new THREE.AmbientLight( 0x404040, ); // soft white light
@@ -37,12 +37,17 @@ class Stage {
 
         const floorGeo = new THREE.PlaneGeometry(1500, 500);
         const floorTexture = this.textureLoader.load('./assets/images/textures/ground.png');
+        const normalMap = this.textureLoader.load('./assets/images/textures/NormalMap.jpg');
         floorTexture.wrapS = THREE.RepeatWrapping;
         floorTexture.wrapT = THREE.RepeatWrapping;
         floorTexture.repeat.set(5, 5);
-        const floorMat = new THREE.MeshLambertMaterial({
-            map: floorTexture
+        const floorMat = new THREE.MeshPhongMaterial({
+            map: floorTexture,
+            normalMap: normalMap,
+            metal: false,
+            skining: true
         });
+        console.log(floorMat)
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI/2;
         floor.castShadow = true;
@@ -56,6 +61,7 @@ class Stage {
             map: skyboxTexture
         });
         this.skybox = new THREE.Mesh(skyGeo, material);
+        //this.skybox.rotation.z = Math.PI/2;
         this.skybox.material.side = THREE.BackSide;
         this.scene.add(this.skybox);
 
@@ -64,10 +70,17 @@ class Stage {
 
             console.log(object)
             this.mixer = new THREE.AnimationMixer(object);
+            console.log(object.animations);
 
-            this.animations.iddle = this.mixer.clipAction(object.animations[0]);
+            this.animations.all = [];
+            object.animations.forEach((animation, index) => {
+                this.animations.all[index] = this.mixer.clipAction(animation);
+            });
+            /*this.animations.iddle = this.mixer.clipAction(object.animations[0]);
             this.animations.walking = this.mixer.clipAction(object.animations[1]);
-            this.animations.iddle.play();
+            this.animations.walkingBackwards = this.mixer.clipAction(object.animations[2]);
+            this.animations.iddle.play();*/
+            this.animations.all[2].play();
 
             object.traverse((child) => {
                 if (child.isMesh) {
@@ -96,7 +109,7 @@ class Stage {
         
         const moveDistance = this.speed * delta;
         /*const actions = this.game.controls.actions;*/
-        if (this.animations.iddle && this.animations.walking) {
+        /*if (this.animations.iddle && this.animations.walking) {
             if (this.actions.FORWARD) {
                 this.character.translateZ(moveDistance);
                 this.animations.walking.play();
@@ -105,7 +118,7 @@ class Stage {
                 this.animations.iddle.play();
                 this.animations.walking.stop();
             }
-        }
+        }*/
 
         this.skybox.rotateY(0.1*delta);
         
@@ -118,12 +131,13 @@ class Stage {
         window.onresize = () => {
             this.resize();
         }
-        window.walk = () => {
-            this.actions.FORWARD = true;
+        window.playAnim = (i) => {
+            this.animations.all.forEach((animation) => {
+                animation.stop();
+            });
+            this.animations.all[i].play();
         }
-        window.stop = () => {
-            this.actions.FORWARD = false;
-        }
+
     }
 
     resize() {
