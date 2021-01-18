@@ -69,11 +69,11 @@ class Stage {
     loader.load('./assets/models/character.fbx', (object) => {
 
       this.animator.create('main', object);
-      this.animator.addAnimation('main', 'idle', 5, 1, false);
-      this.animator.addAnimation('main', 'walking', 4, 1, false);
-      this.animator.addAnimation('main', 'kicking', 3, 1, false);
-      this.animator.addAnimation('main', 'punching', 1, 1, false);
-      this.animator.playFade('main', 'idle', 0.5);
+      this.animator.addAnimation('main', 'idle', 5, 1, 1, true);
+      this.animator.addAnimation('main', 'walking', 4, 0, 1, true);
+      this.animator.addAnimation('main', 'kicking', 3, 0, 10, false);
+      this.animator.addAnimation('main', 'punching', 1, 0, 5, false);
+      //this.animator.playFade('main', 'idle', 0.5);
 
       object.traverse((child) => {
         if (child.isMesh) {
@@ -103,6 +103,19 @@ update() {
     
     this.animator.update(delta);
     this.skybox.rotateY(0.1*delta);
+
+    if (this.walking) {
+      this.character.translateZ(moveDistance);
+      if (this.animator.currentlyPlaying('main') !== 'walking') {
+        this.animator.playFade('main', 'walking', 0.1);
+      }
+    } else if (this.walkingBack) {
+      this.character.translateZ(-moveDistance);
+    }
+
+    if (!this.walking && this.animator.currentlyPlaying('main') === 'walking') {
+      this.animator.playFade('main', 'idle', 0.5);
+    }
       
     this.renderer.render(this.scene, this.camera);
   }
@@ -114,11 +127,19 @@ update() {
   }
 
   kick() {
-    this.animator.playFade('main', 'kicking');
+    if (this.animator.currentlyPlaying('main') === 'idle') {
+      this.animator.playFade('main', 'kicking', 0.05, () => {
+        this.animator.playFade('main', 'idle', 0.5);
+      });
+    }
   }
 
   punch() {
-    this.animator.playFade('main', 'punching');
+    if (this.animator.currentlyPlaying('main') === 'idle') {
+      this.animator.playFade('main', 'punching', 0.05, () => {
+        this.animator.playFade('main', 'idle', 0.5);
+      });
+    }
   }
 
   resize() {

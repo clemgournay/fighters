@@ -20,6 +20,11 @@ class Controls {
       switch(e.keyCode) {
         case 39:
           this.game.stage.walking = true;
+          this.game.stage.walkingBack = false;
+          break;
+        case 37:
+          this.game.stage.waling = false;
+          this.game.stage.walkingBack = true;
           break;
       }
     }
@@ -27,6 +32,9 @@ class Controls {
       switch(e.keyCode) {
         case 39:
           this.game.stage.walking = false;
+          break;
+        case 37:
+          this.game.stage.walkingBack = false;
           break;
       }
     }
