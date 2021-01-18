@@ -6,12 +6,14 @@ class Controls {
 
   init() {
     window.onkeypress = (e) => {
+      this.game.stage.walking = false;
+      this.game.stage.walkingBack = false;
       console.log(e);
       switch(e.keyCode) {
-        case 107:
+        case 110:
           this.game.stage.kick();
           break;
-        case 112:
+        case 98:
           this.game.stage.punch();
           break;
       }
